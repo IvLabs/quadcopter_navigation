@@ -32,5 +32,5 @@ A* after processing with RDP Algorithm   |  Final Trajectory after B Spline appr
 ## Acknowledgements
 * I have used [B Spline](https://github.com/AtsushiSakai/PythonRobotics/tree/master/PathPlanning/BSplinePath) module.
 
-
-
+## Contributor
+* [Ayush Singh](https://github.com/Ayush1285)
