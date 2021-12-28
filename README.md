@@ -16,13 +16,12 @@ A* after processing with RDP Algorithm   |  Final Trajectory after B Spline appr
 ![](https://github.com/IvLabs/quadcopter_navigation/blob/main/results/astarrviz.gif)
 
 ## Trajectory Tracking using PX4 OFFBOARD Control
-**Lemniscate Trajectory**
 
-![](https://github.com/IvLabs/quadcopter_navigation/blob/main/results/lemniscatetraj.gif)
 
-**Circle Trajectory**
+**Lemniscate Trajectory**  | **Circle Trajectory**
+:----------------------:|:------------------------:
 
-![](https://github.com/IvLabs/quadcopter_navigation/blob/main/results/circletraj.gif)
+![](https://github.com/IvLabs/quadcopter_navigation/blob/main/results/lemniscatetraj.gif) | ![](https://github.com/IvLabs/quadcopter_navigation/blob/main/results/circletraj.gif)
 
 
 ## On-going Work
