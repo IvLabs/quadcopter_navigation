@@ -18,10 +18,11 @@ A* after processing with RDP Algorithm   |  Final Trajectory after B Spline appr
 ## Trajectory Tracking using PX4 OFFBOARD Control
 
 
-**Lemniscate Trajectory**  | **Circle Trajectory**
-:----------------------:|:------------------------:
+**Lemniscate Trajectory**
+![](https://github.com/IvLabs/quadcopter_navigation/blob/main/results/lemniscatetraj.gif)
 
-![](https://github.com/IvLabs/quadcopter_navigation/blob/main/results/lemniscatetraj.gif) | ![](https://github.com/IvLabs/quadcopter_navigation/blob/main/results/circletraj.gif)
+**Circle Trajectory**
+![](https://github.com/IvLabs/quadcopter_navigation/blob/main/results/circletraj.gif)
 
 
 ## On-going Work
