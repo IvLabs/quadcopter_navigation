@@ -27,7 +27,7 @@ A* after processing with RDP Algorithm   |  Final Trajectory after B Spline appr
 
 
 ## On-going Work
-* Integrating gmapping with planner and trajectory tracking modules for autonomous navigation. 
+* Integrating gmapping with planning and trajectory tracking modules for autonomous navigation. 
 
 ## Acknowledgements
 * I have used [B Spline](https://github.com/AtsushiSakai/PythonRobotics/tree/master/PathPlanning/BSplinePath) module.
