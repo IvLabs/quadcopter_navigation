@@ -1,7 +1,15 @@
 <launch>
-
+    <arg name="map_file" default="$(find quadcopter)/map/pillarsmap.yaml"/>
     <node pkg="tf" type="static_transform_publisher" name="staticmap" args="0 0 0 0 0 0 map my_frame 50" />
     <node pkg="rviz" type="rviz" name="rviz" args="-d $(find quadcopter)/config/planner.rviz"/>
-    <node pkg="quadcopter" type="runastar.py" name="runastar"></node>
+    <node pkg="map_server" type="map_server" name="mapserver" args="$(arg map_file)"/>
+    <node name="uav_tf2_broadcaster" pkg="quadcopter" type="uav_tf2_broadcaster.py" respawn="false" output="screen" ></node>
+    <node pkg="tf" type="static_transform_publisher" name="maptoodom" args="0 0 0 0 0 0 map odom 50" />
+    <node pkg="tf" type="static_transform_publisher" name="basetolidar" args="0 0 0.09 0 0 0 base_link lidar_link 50" />
+    <node pkg="tf" type="static_transform_publisher" name="basetodepthcam" args="0.1 0.025 0.025 0 0 0 base_link depth_camera::link 50" />
+    <node pkg="tf" type="static_transform_publisher" name="depthcamoptical" args="0 0 0 -1.5708 0 -1.5708 depth_camera::link camera_optical_link 50" />
+
+    <node pkg="quadcopter" type="runastar.py" name="runastar"/>
+    <node pkg="quadcopter" type="trajpublisher.py" name="trajpublisher"/>
 
 </launch>

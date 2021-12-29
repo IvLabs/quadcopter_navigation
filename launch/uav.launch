@@ -5,7 +5,7 @@
     <!-- vehicle pose -->
 
     <arg name="x" default="0"/>
-    <arg name="y" default="0"/>
+    <arg name="y" default="-10"/>
     <arg name="z" default="0"/>
     <arg name="R" default="0"/>
     <arg name="P" default="0"/>
@@ -13,7 +13,7 @@
     <!-- vehicle model and world -->
     <arg name="est" default="ekf2"/>
     <arg name="vehicle" default="iris"/>
-    <arg name="world" default="$(find quadcopter)/worlds/empty.world"/>
+    <arg name="world" default="$(find quadcopter)/worlds/cylpillars.world"/>
     <arg name="sdf" default="$(find quadcopter)/models/iris_depth_camera/iris_depth_camera.sdf"/>
     <env name="PX4_SIM_MODEL" value="$(arg vehicle)" />
     <env name="PX4_ESTIMATOR" value="$(arg est)" />

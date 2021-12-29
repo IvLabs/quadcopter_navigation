@@ -39,10 +39,10 @@ class Controller:
         self.state = State()
         self.sp = PositionTarget()
 
-        self.sp.type_mask = int('000111111000', 2)
+        self.sp.type_mask = int('001111111000', 2)
         self.sp.coordinate_frame = 1
 
-        self.desired_height = 1.0
+        self.desired_height = 2.0
         
         self.sp.position.z = self.desired_height
 
@@ -50,13 +50,16 @@ class Controller:
         self.curr_yaw = 0
         self.sp.position.x = 0.0
         self.sp.position.y = 0.0
+        self.sp.yaw = 0.0
+        self.sp.yaw_rate = 0.0
 
 	
     def posCb(self, msg):
         self.local_pos.x = msg.pose.position.x
         self.local_pos.y = msg.pose.position.y
         self.local_pos.z = msg.pose.position.z
-        self.curr_yaw = msg.pose.orientation.z
+        roll,pitch,yaw = euler_from_quaternion([msg.pose.orientation.x,msg.pose.orientation.y,msg.pose.orientation.z,msg.pose.orientation.w])
+        self.curr_yaw = yaw
 
     ## Drone State callback
     def stateCb(self, msg):
@@ -64,8 +67,10 @@ class Controller:
 
     def desSp(self, msg):
         self.sp.position.x = msg.position.x 
-        self.sp.position.y = msg.position.y
+        self.sp.position.y = msg.position.y + 10
         self.sp.position.z = msg.position.z
+        roll,pitch,yaw = euler_from_quaternion([msg.orientation.x,msg.orientation.y,msg.orientation.z,msg.orientation.w])
+        self.sp.yaw = yaw
 
 
 def main():

@@ -44,12 +44,12 @@
     <param name="resampleThreshold" value="0.5"/>
     <param name="particles" value="80"/>
   
-    <param name="xmin" value="-12.0"/>
-    <param name="ymin" value="-12.0"/>
-    <param name="xmax" value="12.0"/>
-    <param name="ymax" value="12.0"/>
+    <param name="xmin" value="-8.0"/>
+    <param name="ymin" value="-8.0"/>
+    <param name="xmax" value="8.0"/>
+    <param name="ymax" value="8.0"/>
 
-    <param name="delta" value="0.04"/>
+    <param name="delta" value="0.08"/>
     <param name="llsamplerange" value="0.01"/>
     <param name="llsamplestep" value="0.01"/>
     <param name="lasamplerange" value="0.005"/>

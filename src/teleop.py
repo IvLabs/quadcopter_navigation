@@ -74,51 +74,62 @@ def main():
             control.sp.position.y = control.local_pos.y
             control.sp.position.z = control.local_pos.z
             control.sp.yaw = control.curr_yaw
+            control.sp.yaw_rate = 0.0
 
         elif key == 's':
             control.sp.position.x = control.local_pos.x - 1
             control.sp.position.y = control.local_pos.y
             control.sp.position.z = control.local_pos.z
             control.sp.yaw = control.curr_yaw
+            control.sp.yaw_rate = 0.0
 
         elif key == 'a':
             control.sp.position.x = control.local_pos.x
             control.sp.position.y = control.local_pos.y + 1
             control.sp.position.z = control.local_pos.z
             control.sp.yaw = control.curr_yaw
+            control.sp.yaw_rate = 0.0
             
         elif key == 'd':
             control.sp.position.x = control.local_pos.x 
             control.sp.position.y = control.local_pos.y - 1
             control.sp.position.z = control.local_pos.z
-            control.sp.yaw = control.curr_yaw          
+            control.sp.yaw = control.curr_yaw
+            control.sp.yaw_rate = 0.0          
             
         elif key == '8':
             control.sp.position.x = control.local_pos.x
             control.sp.position.y = control.local_pos.y
             control.sp.position.z = control.local_pos.z + 0.5
-            control.sp.yaw = control.curr_yaw           
+            control.sp.yaw = control.curr_yaw 
+            control.sp.yaw_rate = 0.0          
 
         elif key == '5':
             control.sp.position.x = control.local_pos.x
             control.sp.position.y = control.local_pos.y
             control.sp.position.z = control.local_pos.z - 0.5
             control.sp.yaw = control.curr_yaw
+            control.sp.yaw_rate = 0.0
         elif key == '4':
             control.sp.position.x = control.local_pos.x
             control.sp.position.y = control.local_pos.y
             control.sp.position.z = control.local_pos.z
-            control.sp.yaw = control.curr_yaw + 0.3
+            control.sp.yaw = control.curr_yaw + 0.75
+            control.sp.yaw_rate = 0.3
         elif key == '6':
             control.sp.position.x = control.local_pos.x
             control.sp.position.y = control.local_pos.y
             control.sp.position.z = control.local_pos.z
-            control.sp.yaw = control.curr_yaw - 0.3    
+            control.sp.yaw = control.curr_yaw - 0.75
+            control.sp.yaw_rate = -0.3    
 
         elif key == 'enter':
             control.sp.position.x = control.local_pos.x 
             control.sp.position.y = control.local_pos.y
-            control.sp.position.z = control.local_pos.z                       
+            control.sp.position.z = control.local_pos.z
+            control.sp.yaw = control.curr_yaw
+            control.sp.yaw_rate = 0.0
+
 
 
         sp_pub.publish(control.sp)
