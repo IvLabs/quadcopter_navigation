@@ -55,3 +55,6 @@ https://user-images.githubusercontent.com/64409716/147904810-0fa1841c-cde9-49d8-
 
 ## Acknowledgements
 * I have used [B Spline](https://github.com/AtsushiSakai/PythonRobotics/tree/master/PathPlanning/BSplinePath) module.
+
+## Contributor
+* [Ayush Singh](https://github.com/Ayush1285)
