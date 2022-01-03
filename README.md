@@ -1,5 +1,5 @@
 ## Objectives
-* To implement autonomous navigation in unknown environment, given the desired goal.
+* Autonomous Navigation using prior built map.
 
 ## Path Planning
 
