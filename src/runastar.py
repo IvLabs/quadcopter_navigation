@@ -22,9 +22,9 @@ def main():
         originy = data.info.origin.position.y
         mapdata = np.array(mapdata)
         mapdata = mapdata.reshape(height,width,order='C')
-        mapdata = mapdata[100:420,100:420]
-        originx = originx + 100*resolution
-        originy = originy + 100*resolution
+        mapdata = mapdata[60:420,60:420]
+        originx = originx + 60*resolution
+        originy = originy + 60*resolution
         print(5)
         #print(originx,originy)
         planner = Astar(resolution,robotradius,mapdata,originx,originy)

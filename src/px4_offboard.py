@@ -66,7 +66,7 @@ class Controller:
         self.state = msg
 
     def desSp(self, msg):
-        self.sp.position.x = msg.position.x 
+        self.sp.position.x = msg.position.x + 10
         self.sp.position.y = msg.position.y + 10
         self.sp.position.z = msg.position.z
         roll,pitch,yaw = euler_from_quaternion([msg.orientation.x,msg.orientation.y,msg.orientation.z,msg.orientation.w])
@@ -79,7 +79,7 @@ def main():
     modes = flightModes()
     control = Controller()
 
-    rate = rospy.Rate(20.0)
+    rate = rospy.Rate(15.0)
     rospy.Subscriber('mavros/state', State, control.stateCb)
     rospy.Subscriber('desired/trajectory',Pose, control.desSp)
     rospy.Subscriber('mavros/local_position/pose', PoseStamped, control.posCb)    

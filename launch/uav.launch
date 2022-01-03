@@ -4,7 +4,7 @@
     <!-- launches MAVROS, PX4 SITL, Gazebo environment, and spawns vehicle -->
     <!-- vehicle pose -->
 
-    <arg name="x" default="0"/>
+    <arg name="x" default="-10"/>
     <arg name="y" default="-10"/>
     <arg name="z" default="0"/>
     <arg name="R" default="0"/>

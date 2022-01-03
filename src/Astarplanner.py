@@ -47,23 +47,25 @@ class Astar:
         length = hypot(p1[1]-p2[1],p1[0]-p2[0])
 
         if p2[0] == p1[0]:
-            py = np.linspace(p1[1],p2[1], int(length/0.8) )
+            py = np.linspace(p1[1],p2[1], int(length/0.4) )
             px = np.ones(len(py))*p1[0]
-            return np.c_[px[1:],py[1:]]
+            return np.c_[px[1:],py[1:]],length
 
 
         slope = ((p2[1]-p1[1])/(p2[0]-p1[0]))
-        px = np.linspace(p1[0],p2[0],int(length/0.8))
+        px = np.linspace(p1[0],p2[0],int(length/0.4))
         py = slope*(px - np.ones(len(px))*p1[0]) + np.ones(len(px))*p1[1]
 
-        return np.c_[px[1:],py[1:]]
+        return np.c_[px[1:],py[1:]],length
 
     def astarplanner(self, start, goal):
+        epsilon = 1
+        print(start,goal)
 
         self.distheuristic = np.sqrt(np.square(self.rows-np.ones(self.map.shape)*self.rows[goal])+\
             np.square(self.cols-np.ones(self.map.shape)*self.cols[goal]))
 
-        self.h = self.distheuristic + self.collisioncostmap # total heuristic cost
+        self.h = epsilon*(self.distheuristic + self.collisioncostmap) # total heuristic cost
 
         self.fcost = np.ones((self.map.shape))*inf  # Astar f costmap initialisation : f = g + h
         self.gcost = np.ones((self.map.shape))*inf  # Astar g costmap initialisation : g the distance from start to current node
@@ -166,19 +168,22 @@ class Astar:
             ypos = [yp]+ypos
 
         #dydx = np.diff(ypos)/np.diff(xpos)
-           
+        print(xpos,ypos)
         lines = runrdp(points,0.1)
         lines = np.array(lines)
-        
+        totallength = 0
         for i in range(len(lines[:,0])-1):
-            linesegment = self.linesegment(lines[i,:],lines[i+1,:])
+            linesegment,length = self.linesegment(lines[i,:],lines[i+1,:])
+            totallength = totallength + length
             if i == 0:
                 new_lines = np.reshape(lines[i,:],(1,2))
             new_lines = np.r_[new_lines,linesegment,lines[i+1,:].reshape((1,2))]
 
         x = new_lines[:,0].tolist()
         y = new_lines[:,1].tolist()
-        xpos,ypos = approximate_b_spline_path(x,y,80)
+        print(x)
+        print(y)
+        xpos,ypos = approximate_b_spline_path(x,y,int(totallength/0.2))
         
         #for i in range(len(new_lines[:,0])):
         for i in range(len(xpos)):
