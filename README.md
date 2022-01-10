@@ -1,5 +1,5 @@
 ## Objectives
-* To implement autonomous navigation in unknown environment, given the desired goal.
+* Autonomous Navigation using prior built map.
 
 ## Path Planning
 
@@ -16,7 +16,6 @@ A* after processing with RDP Algorithm   |  Final Trajectory after B Spline appr
 ![](https://github.com/IvLabs/quadcopter_navigation/blob/main/results/astarrviz.gif)
 
 ## Trajectory Tracking using PX4 OFFBOARD Control
-
 **Lemniscate Trajectory**
 
 ![](https://github.com/IvLabs/quadcopter_navigation/blob/main/results/lemniscatetraj.gif)
@@ -25,12 +24,35 @@ A* after processing with RDP Algorithm   |  Final Trajectory after B Spline appr
 
 ![](https://github.com/IvLabs/quadcopter_navigation/blob/main/results/circletraj.gif)
 
+## Mapping
+* Generated Map of cylpillars.world using gmapping package.
+* I have used ground truth for odometry information.
 
-## On-going Work
-* Integrating gmapping with planning and trajectory tracking modules for autonomous navigation. 
+<img src="https://github.com/IvLabs/quadcopter_navigation/blob/main/results/pillarsmap.png" height="400"> 
+
+## Navigation
+Autonomous Navigation to given desired goal
+
+**RVIZ**
+
+
+
+https://user-images.githubusercontent.com/64409716/147905968-02fa05b8-cd6a-49e4-845e-93c49d9979f5.mp4
+
+
+
+**Gazebo**
+
+
+https://user-images.githubusercontent.com/64409716/147904810-0fa1841c-cde9-49d8-82e0-91144fad8688.mp4
+
+
+
+
+## Future Work
+* Implementing different planners
+* VIO for Odometry Info
 
 ## Acknowledgements
 * I have used [B Spline](https://github.com/AtsushiSakai/PythonRobotics/tree/master/PathPlanning/BSplinePath) module.
 
-## Contributor
-* [Ayush Singh](https://github.com/Ayush1285)
