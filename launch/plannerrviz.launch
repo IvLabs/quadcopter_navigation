@@ -9,7 +9,7 @@
     <node pkg="tf" type="static_transform_publisher" name="basetodepthcam" args="0.1 0.025 0.025 0 0 0 base_link depth_camera::link 50" />
     <node pkg="tf" type="static_transform_publisher" name="depthcamoptical" args="0 0 0 -1.5708 0 -1.5708 depth_camera::link camera_optical_link 50" />
 
-    <node pkg="quadcopter" type="runastar.py" name="runastar"/>
+    <!--<node pkg="quadcopter" type="runastar.py" name="runastar"/>-->
     <node pkg="quadcopter" type="trajpublisher.py" name="trajpublisher"/>
 
 </launch>

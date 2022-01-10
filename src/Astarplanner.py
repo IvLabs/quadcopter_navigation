@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import numpy as np
-from math import ceil,inf,hypot,sqrt,atan
+from math import ceil,inf,hypot,atan
+from scipy.ndimage import grey_dilation
 from nav_msgs.msg import Path
 from geometry_msgs.msg import PoseStamped
 from numpy.core.numeric import Inf
@@ -17,7 +18,7 @@ class Astar:
         self.width = self.map.shape[1]
         self.resolution = resolution
         self.rr = robotradius
-        self.Rd = robotradius + 0.1
+        self.Rd = robotradius + 0.3
         self.krep = 20
         self.collisioncostmap = np.zeros(self.map.shape)
         self.parent = np.zeros(self.map.shape)
@@ -25,7 +26,7 @@ class Astar:
         self.cols, self.rows = np.meshgrid(self.nrows,self.nrows)
         self.updatecollisioncostmap()
         
-    def updatecollisioncostmap(self):
+    '''def updatecollisioncostmap(self):
         for i in range(self.height):
             for j in range(self.width):
                 if self.map[i,j]==100:
@@ -40,6 +41,11 @@ class Astar:
                             elif distancebtwcells < self.Rd/self.resolution:
                                 self.collisioncostmap[othercell[0], othercell[1]] = max(self.collisioncostmap[othercell[0], othercell[1]],\
                                 self.krep*((self.Rd/self.resolution - distancebtwcells)/(self.Rd/self.resolution - self.rr/self.resolution))**2)
+        print(10)'''
+
+    def updatecollisioncostmap(self):
+        n = int((self.Rd+0.2)/self.resolution)
+        self.collisioncostmap = grey_dilation(self.map,size=(n,n))*10000
         print(10)
           
     def linesegment(self, p1, p2):
@@ -58,117 +64,111 @@ class Astar:
 
         return np.c_[px[1:],py[1:]],length
 
+    def distheuristic(self,a,b):
+        return hypot(a[0]-b[0],a[1]-b[1])
+
     def astarplanner(self, start, goal):
         epsilon = 1
-        print(start,goal)
+        openlist = {}
+        closedlist = {}
+        parentlist = {}
+        gcost =  {}
+        gcost[start] = 0.0
+        openlist[start] = self.distheuristic(start,goal)
 
-        self.distheuristic = np.sqrt(np.square(self.rows-np.ones(self.map.shape)*self.rows[goal])+\
-            np.square(self.cols-np.ones(self.map.shape)*self.cols[goal]))
-
-        self.h = epsilon*(self.distheuristic + self.collisioncostmap) # total heuristic cost
-
-        self.fcost = np.ones((self.map.shape))*inf  # Astar f costmap initialisation : f = g + h
-        self.gcost = np.ones((self.map.shape))*inf  # Astar g costmap initialisation : g the distance from start to current node
-        self.gcost[start] = 0
-        self.fcost[start] = self.gcost[start[0],start[1]] + self.h[start]
-                                                                                            #euclidean distance heuristic
-        openlist = [[self.fcost[start],start]]
-        closedlist = np.ones(self.map.shape,dtype=bool)
-        #print(closedlist[start])
 
         while True:
-            openlist = sorted(openlist)
-            #print(openlist)
-            i,j = openlist[0][1]
-            if i==goal[0] and j==goal[1] or self.fcost[i,j] == inf:
+            current_node = min(openlist, key = openlist.get)
+            i,j = current_node
+            if current_node==goal or openlist[current_node] == inf:
                 break
             
-            openlist.pop(0)
-            closedlist[i][j] = False
-            #print(self.map[i-1:i+2,j-1:j+2])
+            openlist.pop(current_node)
+            closedlist[current_node] = True
+           
 
-            if self.map[min(i+1,self.width-2),j] in [-1,0] and closedlist[min(i+1,self.width-2),j] == True :
-                fnew = self.gcost[i,j] + 1 + self.h[min(i+1,self.width-2),j]
-                if self.fcost[min(i+1,self.width-2),j] == inf or self.fcost[min(i+1,self.width-2),j] > fnew :
-                    openlist.append([fnew,(min(i+1,self.width-2),j)])
-                    self.gcost[min(i+1,self.width-2),j] = self.gcost[i,j] + 1
-                    self.fcost[min(i+1,self.width-2),j] = fnew
-                    self.parent[min(i+1,self.width-2),j] = int(self.width*i+j)
+            if self.map[min(i+1,self.width-2),j] in [-1,0] and (min(i+1,self.width-2),j) not in closedlist :
+                fnew = gcost[current_node] + 1 + self.distheuristic((min(i+1,self.width-2),j),goal) + \
+                    self.collisioncostmap[min(i+1,self.width-2),j]
+                if (min(i+1,self.width-2),j) not in openlist or openlist[min(i+1,self.width-2),j] > fnew :
+                    openlist[(min(i+1,self.width-2),j)] = fnew
+                    gcost[(min(i+1,self.width-2),j)] = gcost[current_node] + 1
+                    parentlist[(min(i+1,self.width-2),j)] = current_node
             
-            if self.map[min(i+1,self.width-2),min(j+1,self.width-2)] in [-1,0] and closedlist[min(i+1,self.width-2),min(j+1,self.width-2)] == True:
-                fnew = self.gcost[i,j] + 1.414 + self.h[min(i+1,self.width-2),min(j+1,self.width-2)]
-                if self.fcost[min(i+1,self.width-2),min(j+1,self.width-2)] > fnew or self.fcost[min(i+1,self.width-2),min(j+1,self.width-2)]==inf:
-                    openlist.append([fnew,(min(i+1,self.width-2),min(j+1,self.width-2))])
-                    self.gcost[min(i+1,self.width-2),min(j+1,self.width-2)] = self.gcost[i,j] + 1.414
-                    self.fcost[min(i+1,self.width-2),min(j+1,self.width-2)] = fnew
-                    self.parent[min(i+1,self.width-2),min(j+1,self.width-2)] = int(self.width*i+j)
+            if self.map[min(i+1,self.width-2),min(j+1,self.width-2)] in [-1,0] and (min(i+1,self.width-2),min(j+1,self.width-2)) not in closedlist:
+                fnew = gcost[current_node] + 1.4 + self.distheuristic((min(i+1,self.width-2),min(j+1,self.width-2)),goal) + \
+                    self.collisioncostmap[min(i+1,self.width-2),min(j+1,self.width-2)]
+                if (min(i+1,self.width-2),min(j+1,self.width-2)) not in openlist or openlist[(min(i+1,self.width-2),min(j+1,self.width-2))]>fnew:
+                    openlist[(min(i+1,self.width-2),min(j+1,self.width-2))] = fnew
+                    gcost[(min(i+1,self.width-2),min(j+1,self.width-2))] = gcost[current_node] + 1.4
+                    parentlist[(min(i+1,self.width-2),min(j+1,self.width-2))] = current_node
 
-            if self.map[i,min(j+1,self.width-2)] in [-1,0] and closedlist[i,min(j+1,self.width-2)] == True:
-                fnew = self.gcost[i,j] + 1 + self.h[i,min(j+1,self.width-2)]
-                if self.fcost[i,min(j+1,self.width-2)] > fnew or self.fcost[i,min(j+1,self.width-2)] == inf:
-                    openlist.append([fnew,(i,min(j+1,self.width-2))])
-                    self.gcost[i,min(j+1,self.width-2)] = self.gcost[i,j] + 1
-                    self.fcost[i,min(j+1,self.width-2)] = fnew
-                    self.parent[i,min(j+1,self.width-2)] = int(self.width*i+j)
+            if self.map[i,min(j+1,self.width-2)] in [-1,0] and (i,min(j+1,self.width-2)) not in closedlist:
+                fnew = gcost[current_node] + 1 + self.distheuristic((i,min(j+1,self.width-2)),goal) + \
+                    self.collisioncostmap[i,min(j+1,self.width-2)]
+                if (i,min(j+1,self.width-2)) not in openlist or openlist[(i,min(j+1,self.width-2))] > fnew:
+                    openlist[(i,min(j+1,self.width-2))] = fnew
+                    gcost[(i,min(j+1,self.width-2))] = gcost[current_node] + 1
+                    parentlist[(i,min(j+1,self.width-2))] = current_node
 
-            if self.map[max(i-1,0),min(j+1,self.width-2)] in [-1,0] and closedlist[max(i-1,0),min(j+1,self.width-2)] == True:
-                fnew = self.gcost[i,j] + 1.414 + self.h[max(i-1,0),min(j+1,self.width-2)]
-                if self.fcost[max(i-1,0),min(j+1,self.width-2)] > fnew or self.fcost[max(i-1,0),min(j+1,self.width-2)] == inf:
-                    openlist.append([fnew,(max(i-1,0),min(j+1,self.width-2))])
-                    self.gcost[max(i-1,0),min(j+1,self.width-2)] = self.gcost[i,j] + 1.414
-                    self.fcost[max(i-1,0),min(j+1,self.width-2)] = fnew
-                    self.parent[max(i-1,0),min(j+1,self.width-2)] = int(self.width*i+j)
+            if self.map[max(i-1,0),min(j+1,self.width-2)] in [-1,0] and (max(i-1,0),min(j+1,self.width-2)) not in closedlist:
+                fnew = gcost[current_node] + 1.4 + self.distheuristic((max(i-1,0),min(j+1,self.width-2)),goal) + \
+                    self.collisioncostmap[max(i-1,0),min(j+1,self.width-2)]
+                if (max(i-1,0),min(j+1,self.width-2)) not in openlist or openlist[(max(i-1,0),min(j+1,self.width-2))] > fnew:
+                    openlist[(max(i-1,0),min(j+1,self.width-2))] = fnew
+                    gcost[(max(i-1,0),min(j+1,self.width-2))] = gcost[current_node] + 1.4
+                    parentlist[(max(i-1,0),min(j+1,self.width-2))] = current_node
 
-            if self.map[max(i-1,0),j] in [-1,0] and closedlist[max(i-1,0),j] == True:
-                fnew = self.gcost[i,j] + 1 + self.h[max(i-1,0),j]
-                if self.fcost[max(i-1,0),j] > fnew or self.fcost[max(i-1,0),j] == inf:
-                    openlist.append([fnew,(max(i-1,0),j)])
-                    self.gcost[max(i-1,0),j] = self.gcost[i,j] + 1
-                    self.fcost[max(i-1,0),j] = fnew
-                    self.parent[max(i-1,0),j] = int(self.width*i+j)
+            if self.map[max(i-1,0),j] in [-1,0] and (max(i-1,0),j) not in closedlist:
+                fnew = gcost[current_node] + 1 + self.distheuristic((max(i-1,0),j),goal) + \
+                    self.collisioncostmap[max(i-1,0),j]
+                if (max(i-1,0),j) not in openlist or openlist[(max(i-1,0),j)] > fnew:
+                    openlist[(max(i-1,0),j)] = fnew
+                    gcost[(max(i-1,0),j)] = gcost[current_node] + 1
+                    parentlist[(max(i-1,0),j)] = current_node
 
-            if self.map[max(i-1,0),max(j-1,0)] in [-1,0] and closedlist[max(i-1,0),max(j-1,0)] == True:
-                fnew = self.gcost[i,j] + 1.414 + self.h[max(i-1,0),max(j-1,0)]
-                if self.fcost[max(i-1,0),max(j-1,0)] > fnew or self.fcost[max(i-1,0),max(j-1,0)] == inf:
-                    openlist.append([fnew,(max(i-1,0),max(j-1,0))])
-                    self.gcost[max(i-1,0),max(j-1,0)] = self.gcost[i,j] + 1.414
-                    self.fcost[max(i-1,0),max(j-1,0)] = fnew
-                    self.parent[max(i-1,0),max(j-1,0)] = int(self.width*i+j)
+            if self.map[max(i-1,0),max(j-1,0)] in [-1,0] and (max(i-1,0),max(j-1,0)) not in closedlist:
+                fnew = gcost[current_node] + 1.4 + self.distheuristic((max(i-1,0),max(j-1,0)),goal) + \
+                    self.collisioncostmap[max(i-1,0),max(j-1,0)]
+                if (max(i-1,0),max(j-1,0)) not in openlist or openlist[(max(i-1,0),max(j-1,0))] > fnew:
+                    openlist[(max(i-1,0),max(j-1,0))] = fnew
+                    gcost[(max(i-1,0),max(j-1,0))] = gcost[current_node] + 1.4
+                    parentlist[(max(i-1,0),max(j-1,0))] = current_node
 
-            if self.map[i,max(j-1,0)] in [-1,0] and closedlist[i,max(j-1,0)] == True:
-                fnew = self.gcost[i,j] + 1 + self.h[i,max(j-1,0)]
-                if self.fcost[i,max(j-1,0)] > fnew or self.fcost[i,max(j-1,0)] == inf :
-                    openlist.append([fnew,(i,max(j-1,0))])
-                    self.gcost[i,max(j-1,0)] = self.gcost[i,j] + 1
-                    self.fcost[i,max(j-1,0)] = fnew
-                    self.parent[i,max(j-1,0)] = int(self.width*i+j)
+            if self.map[i,max(j-1,0)] in [-1,0] and (i,max(j-1,0)) not in closedlist:
+                fnew = gcost[current_node] + 1 + self.distheuristic((i,max(j-1,0)),goal) + \
+                    self.collisioncostmap[i,max(j-1,0)]
+                if (i,max(j-1,0)) not in openlist or openlist[(i,max(j-1,0))] > fnew:
+                    openlist[(i,max(j-1,0))] = fnew
+                    gcost[(i,max(j-1,0))] = gcost[current_node] + 1
+                    parentlist[(i,max(j-1,0))] = current_node
 
-            if self.map[min(i+1,self.width-2),max(j-1,0)] in [-1,0] and closedlist[min(i+1,self.width-2),max(j-1,0)] == True:
-                fnew = self.gcost[i,j] + 1.414 + self.h[min(i+1,self.width-2),max(j-1,0)]
-                if self.fcost[min(i+1,self.width-2),max(j-1,0)] > fnew or self.fcost[min(i+1,self.width-2),max(j-1,0)] == inf :
-                    openlist.append([fnew,(min(i+1,self.width-2),max(j-1,0))])
-                    self.gcost[min(i+1,self.width-2),max(j-1,0)] = self.gcost[i,j] + 1.414
-                    self.fcost[min(i+1,self.width-2),max(j-1,0)] = self.gcost[min(i+1,self.width-2),max(j-1,0)] + self.h[min(i+1,self.width-2),max(j-1,0)]
-                    self.parent[min(i+1,self.width-2),max(j-1,0)] = int(self.width*i+j)
+            if self.map[min(i+1,self.width-2),max(j-1,0)] in [-1,0] and (min(i+1,self.width-2),max(j-1,0)) not in closedlist:
+                fnew = gcost[current_node] + 1.4 + self.distheuristic((min(i+1,self.width-2),max(j-1,0)),goal) + \
+                    self.collisioncostmap[min(i+1,self.width-2),max(j-1,0)]
+                if (min(i+1,self.width-2),max(j-1,0)) not in openlist or openlist[(min(i+1,self.width-2),max(j-1,0))] > fnew :
+                    openlist[(min(i+1,self.width-2),max(j-1,0))] = fnew
+                    gcost[(min(i+1,self.width-2),max(j-1,0))] = gcost[current_node] + 1.4
+                    parentlist[(min(i+1,self.width-2),max(j-1,0))] = current_node
+                    
         pathros = Path()
         pathros.header.frame_id = "map"
-        path = [int(self.width*i+j)]
+        key = goal
+        path = [goal]
         ypos = [i*self.resolution + self.originy]
         xpos = [j*self.resolution + self.originx]
         points = [[xpos[0],ypos[0]]]
-        while path[0] != self.width*start[0]+start[1] :
-            i,j = np.unravel_index(int(path[0]), self.map.shape, order='C')
-            path = [int(self.parent[i,j])] + path
-            yp,xp = np.unravel_index(path[0],self.map.shape)
-            
+        while key != start :
+            key = parentlist[key]
+            i,j = key
+            path.insert(0,key)
+            yp,xp = key
             xp = xp*self.resolution + self.originx
             yp = yp*self.resolution + self.originy
             points = [[xp,yp]]+points
             xpos = [xp]+xpos
             ypos = [yp]+ypos
 
-        #dydx = np.diff(ypos)/np.diff(xpos)
-        print(xpos,ypos)
         lines = runrdp(points,0.1)
         lines = np.array(lines)
         totallength = 0
@@ -181,8 +181,6 @@ class Astar:
 
         x = new_lines[:,0].tolist()
         y = new_lines[:,1].tolist()
-        print(x)
-        print(y)
         xpos,ypos = approximate_b_spline_path(x,y,int(totallength/0.2))
         
         #for i in range(len(new_lines[:,0])):

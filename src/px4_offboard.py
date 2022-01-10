@@ -79,7 +79,7 @@ def main():
     modes = flightModes()
     control = Controller()
 
-    rate = rospy.Rate(15.0)
+    rate = rospy.Rate(20.0)
     rospy.Subscriber('mavros/state', State, control.stateCb)
     rospy.Subscriber('desired/trajectory',Pose, control.desSp)
     rospy.Subscriber('mavros/local_position/pose', PoseStamped, control.posCb)    
